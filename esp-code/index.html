@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Controller</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f3f3f3;
+            padding-top: 40px;
+        }
+
+        button {
+            width: 130px;
+            height: 60px;
+            margin: 12px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Robot Controller</h1>
+
+    <div>
+        <button onclick="sendCmd('forward')" style="background:#4CAF50;">FORWARD</button>
+    </div>
+
+    <div>
+        <button onclick="sendCmd('left')"  style="background:#2196F3;">LEFT</button>
+        <button onclick="sendCmd('stop')"  style="background:#f44336;">STOP</button>
+        <button onclick="sendCmd('right')" style="background:#2196F3;">RIGHT</button>
+    </div>
+
+    <div>
+        <button onclick="sendCmd('backward')" style="background:#4CAF50;">BACKWARD</button>
+    </div>
+
+    <div>
+        <button onclick="sendCmd('linefollow')" style="background:#9C27B0;">LINE FOLLOW</button>
+    </div>
+
+    <p id="status"></p>
+
+    <script>
+        // Change this to your ESP32 IP
+        const ESP_IP = "http://10.126.186.127";
+
+        function sendCmd(direction) {
+            const url = `${ESP_IP}/api/move/${direction}`;
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("status").innerText =
+                        "Sent: " + direction.toUpperCase();
+                })
+                .catch(err => {
+                    document.getElementById("status").innerText = "ERROR SENDING!";
+                    console.error(err);
+                });
+        }
+    </script>
+
+</body>
+</html>
