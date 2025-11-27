@@ -88,40 +88,98 @@ void forwardUntilMiddleSensors()
   halt();
 }
 
-void Controller_Mode()
-{
- if (Serial.available()) {
-    String cmd = Serial.readStringUntil('\n');
-    cmd.trim();
+void setup() {
+  Serial.begin(115200);   // Same as ESP
+  // init motors, lifter, strip LEDs, QR scanner, sensors...
+}
 
-    if (cmd == "FORWARD") {
-      Serial.print('Moving Forward');
-      forward(80);
+void loop() {
+  Controller_Mode();
+}
+
+void Controller_Mode() {
+
+  if (!Serial.available()) return;
+
+  String cmd = Serial.readStringUntil('\n');
+  cmd.trim();
+
+  // ---------------- MOVEMENT ----------------
+  if (cmd == "FORWARD") {
+    Serial.println("Moving Forward");
+    forward(80);
+  }
+  else if (cmd == "BACKWARD") {
+    Serial.println("Moving Backward");
+    backward(80);
+  }
+  else if (cmd == "LEFT") {
+    Serial.println("Turning Left");
+    left90(80);
+  }
+  else if (cmd == "RIGHT") {
+    Serial.println("Turning Right");
+    right90(80);
+  }
+  else if (cmd == "STOP") {
+    Serial.println("Robot Stopped");
+    halt();
+  }
+
+  // ---------------- LINE FOLLOW ----------------
+  else if (cmd == "LINEFOLLOW") {
+    Serial.println("Following Line");
+    linefollow(80);
+  }
+
+  // ---------------- LIFTER ----------------
+  else if (cmd == "LIFT_UP") {
+    Serial.println("Lifter Up");
+    lift_up();
+  }
+  else if (cmd == "LIFT_DOWN") {
+    Serial.println("Lifter Down");
+    lift_down();
+  }
+  else if (cmd == "LIFT_STOP") {
+    Serial.println("Lifter Stop");
+    lift_stop();
+  }
+
+  // ---------------- QR SCAN ----------------
+  else if (cmd == "SCAN") {
+    Serial.println("Scanning...");
+    startQRScanner();
+  }
+  else if (cmd == "SCAN_OUTPUT") {
+    Serial.println("Returning QR Output");
+    sendQRData();
+  }
+
+  // ---------------- STRIP PATTERNS 1-30 ----------------
+ else if (cmd.startsWith("STRIP_")) {
+    // Extract the number after "STRIP_"
+    int stripID = cmd.substring(6).toInt();  
+
+    if (stripID >= 1 && stripID <= 30) {
+        Serial.print("Starting linefollowUntil for Strip ");
+        Serial.println(stripID);
+
+        linefollowUntil(stripID);  // call your existing function
+    } 
+    else {
+        Serial.println("Invalid Strip ID received!");
     }
-    else if (cmd == "BACKWARD") {
-      Serial.print('Moving Backward');
-      backward(80);
-    }
-    else if (cmd == "LEFT") {
-      Serial.print('Turning Left');
-      left90(80);
-    }
-    else if (cmd == "RIGHT") {
-        Serial.print('Turning Right');
-      right90(80);
-    }
-    else if (cmd == "STOP") {
-       Serial.print('Robot is Stopped');
-      halt();
-    }
-     else if (cmd == "LineFollow") {
-       Serial.print('Following Line');
-      linefollow(80);
-    }
-    else{
-      Serial.print('Invalid Instruction');
-    }
-}}
+}
+
+
+  // ---------------- INVALID COMMAND ----------------
+  else {
+    Serial.print("Invalid Command: ");
+    Serial.println(cmd);
+  }
+}
+
 
 void configurePins()
 {
@@ -190,7 +248,6 @@ void loop() {
      Controller_Mode();
   
   } else {
-   
     Serial.println("Autonomous Mode");
    }
   }
