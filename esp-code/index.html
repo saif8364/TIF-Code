@@ -1,75 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Robot Controller</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Control Interface - Mode Selection</title>
     <style>
+        /* Base Styles */
         body {
-            font-family: Arial;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            background: #f3f3f3;
-            padding-top: 40px;
+            background-color: #000000; 
+            color: #FFFFFF;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* RE-APPLIED: Center content block vertically on the screen */
+            justify-content: center; 
         }
 
-        button {
-            width: 130px;
-            height: 60px;
-            margin: 12px;
-            font-size: 20px;
-            border-radius: 10px;
-            cursor: pointer;
+        /* Container for all main content, allowing it to be centered */
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Removed gap: 10vh to rely on standard margin spacing */
+            max-width: 90%; 
         }
 
-        #status {
-            margin-top: 20px;
-            font-size: 18px;
+
+        /* Header and Title Styling */
+        h1 {
+            font-size: 2.5em;
+            color: #FFFFFF; 
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4); 
+            margin-top: 0; /* Ensures it sits neatly at the top of the centered block */
+            padding-bottom: 10vh;
+            margin-bottom: 20px; 
+        }
+
+        /* --- Group Member Styling (Styled like White Buttons) --- */
+        .member-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 40px;
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100vw;
+            /* Removed fixed width: 100vw, letting it naturally center */
+            max-width: 600px; 
+        }
+
+        .member-list li {
+            background-color: #E0E0E0;
+            color: #000000;
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: 1px solid #555555;
+            font-size: 0.8em;
             font-weight: bold;
-            color: green;
+            transition: background-color 0.1s;
+        }
+
+        .member-list li:hover {
+            background-color: #FFFFFF;
+        }
+        
+        /* --- Button Layout and Responsiveness --- */
+        .mode-container {
+            display: flex;
+            gap: 40px;
+            width: 100%; /* Fill the width of the main container */
+            max-width: 500px;
+            margin-top: 30px;
+            /* Ensure the mode container itself is centered within its flex parent (body) */
+            justify-content: center; 
+        }
+        
+        /* Control Group (Card) Styling - Simplified */
+        .control-group {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Anchor Tag as the primary clickable element */
+        .mode-link {
+            width: 100%;
+            height: 70px;
+            text-decoration: none; 
+            font-size: 1.3em;
+            font-weight: bold;
+            border: 1px solid #555555; 
+            border-radius: 4px; 
+            color: #000000; 
+            margin: 0;
+            cursor: pointer;
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.1s, border-color 0.1s;
+            box-sizing: border-box; 
+        }
+
+        /* Specific Link Colors (Same neutral light gray for both) */
+        #autonomous-link, #manual-link {
+            background-color: #E0E0E0; 
+        }
+        #autonomous-link:hover, #manual-link:hover {
+            background-color: #FFFFFF; 
+            border-color: #AAAAAA;
+        }
+
+        /* Status Placeholder - Fixed at bottom of viewport */
+        #status {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9em;
+            color: #CCCCCC;
+            padding: 10px 0;
+            background-color: #1a1a1a;
+            border-top: 1px solid #333333;
+            box-sizing: border-box;
+        }
+
+        /* --- Media Query for Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            body {
+                /* On small screens, start content from the top to give space */
+                justify-content: flex-start;
+                padding-top: 20px; 
+            }
+            .mode-container {
+                flex-direction: column;
+                gap: 15px;
+                max-width: 90%;
+            }
+            .mode-link {
+                height: 60px;
+                font-size: 1.2em;
+            }
+            .member-list {
+                gap: 10px;
+                margin-bottom: 25px;
+            }
+            .member-list li {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
         }
     </style>
 </head>
 <body>
-
-    <h1>Robot Controller</h1>
-
-    <div>
-        <button onclick="sendCmd('forward')" style="background:#4CAF50;">FORWARD</button>
-    </div>
-
-    <div>
-        <button onclick="sendCmd('left')"  style="background:#2196F3;">LEFT</button>
-        <button onclick="sendCmd('stop')"  style="background:#f44336;">STOP</button>
-        <button onclick="sendCmd('right')" style="background:#2196F3;">RIGHT</button>
-    </div>
-
-    <div>
-        <button onclick="sendCmd('backward')" style="background:#4CAF50;">BACKWARD</button>
-    </div>
-
-    <div>
-        <button onclick="sendCmd('linefollow')" style="background:#9C27B0;">LINE FOLLOW</button>
-    </div>
-
-    <p id="status"></p>
-
-    <script>
-        // Change this to your ESP32 IP
-        const ESP_IP = "http://10.126.186.127";
-
-        function sendCmd(direction) {
-            const url = `${ESP_IP}/api/move/${direction}`;
+    <div class="main">
+        <h1>ALR (Autonomous Logistic Robots)</h1>
+        
+        <ul class="member-list">
+            <li>Saif Ullah</li>
+            <li>Muhammad Ahmad Samdani</li>
+            <li>Asad Ali</li>
+            <li>Smranz Zahid</li>
+        </ul>
+        
+        <p>Select your operational mode:</p>
+        
+        <div class="mode-container">
             
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById("status").innerText =
-                        "Sent: " + direction.toUpperCase();
-                })
-                .catch(err => {
-                    document.getElementById("status").innerText = "ERROR SENDING!";
-                    console.error(err);
-                });
-        }
-    </script>
+            <div class="control-group">
+                <a href="autonomus.html" class="mode-link" id="autonomous-link">
+                    Autonomous
+                </a>
+            </div>
 
+            <div class="control-group">
+                <a href="controlled.html" class="mode-link" id="manual-link">
+                    Manual
+                </a>
+            </div>
+            
+        </div>
+    </div>
+ 
+    
 </body>
 </html>

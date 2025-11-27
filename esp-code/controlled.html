@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Controller UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .section {
+            border: 1px solid #888;   /* thin border */
+            border-radius: 5px;       /* small radius */
+            padding: 15px;
+            margin-bottom: 20px;      /* space between sections */
+            background: #111;
+            width: 29vw;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            width: 110px;
+            padding: 10px;
+            margin: 5px;
+            background: #fff;
+            color: #000;
+            font-size: 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #d9d9d9;
+        }
+
+        input[type="number"] {
+            padding: 8px;
+            width: 140px;
+            border-radius: 4px;
+            border: none;
+            margin-right: 10px;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #0f0;
+            text-align: center;
+        }
+
+        .main{
+            display: flex;
+            flex-direction: row;
+            
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 99vw;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Robot Control Dashboard</h1>
+
+<!-- CONTROLLER MOVEMENT -->
+ <div class="main">
+
+
+<div class="section">
+    <h2>Controller</h2>
+    <div class="row">
+        <button class="btn" onclick="sendCmd('left')">←</button>
+        <button class="btn" onclick="sendCmd('forward')">↑</button>
+        <button class="btn" onclick="sendCmd('right')">→</button>
+    </div>
+    <div class="row">
+        <button class="btn" onclick="sendCmd('backward')">↓</button>
+    </div>
+</div>
+
+<!-- 90° TURN -->
+<div class="section">
+    <h2>90° Turn</h2>
+    <div class="row">
+        <button class="btn" onclick="sendCmd('left')">⟲ Left</button>
+        <button class="btn" onclick="sendCmd('right')">⟳ Right</button>
+    </div>
+</div>
+
+<!-- LIFTER -->
+<div class="section">
+    <h2>Lifter</h2>
+    <div class="row">
+        <button class="btn" onclick="sendCmd('lift_up')">UP</button>
+        <button class="btn" onclick="sendCmd('lift_down')">DOWN</button>
+        <button class="btn" onclick="sendCmd('lift_stop')">STOP</button>
+    </div>
+</div>
+
+
+
+<!-- LINE FOLLOW -->
+<div class="section">
+    <h2>Line Follow</h2>
+    <div class="row">
+       
+        <button class="btn" onclick="sendCmd('line_follow')">Simple Line Follow</button>
+    </div>
+    <div class="row">
+        <input id="stripValue" type="number" placeholder="Enter Strip #">
+        <button class="btn" onclick="sendStrip()">Follow</button>
+    </div>
+</div>
+
+<!-- QR CODE SCAN -->
+<div class="section">
+    <h2>QR Code Scan</h2>
+    <div class="row">
+        <button class="btn" onclick="sendCmd('scan')">SCAN</button>
+        <button class="btn" onclick="sendCmd('scan_output')">View Output</button>
+        <button class="btn" onclick="sendCmd('stop')">STOP</button>
+    </div>
+</div>
+ </div>
+
+<p id="status"></p>
+
+<script>
+    const ESP_IP = "http://10.52.17.77"; // replace with your ESP IP
+
+    function sendCmd(cmd) {
+        let espCmd = cmd.toLowerCase(); // make route lowercase
+
+        // Special mapping for line follow and QR scan
+        if (cmd === 'line_follow') espCmd = 'linefollow';
+        if (cmd === 'scan') espCmd = 'scan';
+        if (cmd === 'scan_output') espCmd = 'scan_output';
+        if (cmd === 'lift_up') espCmd = 'lift_up';
+        if (cmd === 'lift_down') espCmd = 'lift_down';
+        if (cmd === 'lift_stop') espCmd = 'lift_stop';
+        if (cmd.startsWith('strip_')) espCmd = cmd;
+
+        fetch(`${ESP_IP}/api/move/${espCmd}`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById("status").innerText = "Sent: " + cmd;
+                console.log(data);
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById("status").innerText = "Error sending!";
+            });
+    }
+
+    function sendStrip() {
+        let val = document.getElementById("stripValue").value;
+        if (val) sendCmd("strip_" + val);
+    }
+</script>
+
+
+</body>
+</html>
