@@ -10,7 +10,7 @@ const char* ssid = "Saif";
 const char* password = "12345678";
 
 // Node.js endpoint for CLIENT MODE
-String serverURL = "http://10.126.186.212:5000/data";
+String serverURL = "http://10.52.17.212:5000/data";
 
 WebServer server(80);
 

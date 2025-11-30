@@ -4,6 +4,7 @@
 #include "LineFollow.h"
 #include "ServoControl.h"
 #include "SonarControl.h"
+#include "StepperControl.h"
 
 
 
@@ -135,26 +136,27 @@ void Controller_Mode() {
   // ---------------- LIFTER ----------------
   else if (cmd == "LIFT_UP") {
     Serial.println("Lifter Up");
-    lift_up();
+    stepUp();
+    
   }
   else if (cmd == "LIFT_DOWN") {
     Serial.println("Lifter Down");
-    lift_down();
+    stepDown();
   }
   else if (cmd == "LIFT_STOP") {
     Serial.println("Lifter Stop");
-    lift_stop();
+    stopStepper();
   }
 
   // ---------------- QR SCAN ----------------
-  else if (cmd == "SCAN") {
-    Serial.println("Scanning...");
-    startQRScanner();
-  }
-  else if (cmd == "SCAN_OUTPUT") {
-    Serial.println("Returning QR Output");
-    sendQRData();
-  }
+  // else if (cmd == "SCAN") {
+  //   Serial.println("Scanning...");
+  //   startQRScanner();
+  // }
+  // else if (cmd == "SCAN_OUTPUT") {
+  //   Serial.println("Returning QR Output");
+  //   sendQRData();
+  // }
 
   // ---------------- STRIP PATTERNS 1-30 ----------------
  else if (cmd.startsWith("STRIP_")) {
@@ -229,6 +231,7 @@ int modeSwitch = 7;
 bool controllerMode = false;
 
 void setup() {
+  
   Serial.begin(9600);
   pinMode(modeSwitch, INPUT_PULLUP);
 
